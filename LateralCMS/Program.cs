@@ -1,4 +1,7 @@
 
+using LateralCMS.Auth;
+using Microsoft.AspNetCore.Authentication;
+
 namespace LateralCMS
 {
     public class Program
@@ -13,6 +16,11 @@ namespace LateralCMS
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
+            builder.Services.AddAuthentication("Basic")
+                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("Basic", null);
+
+            builder.Services.AddAuthorization();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -20,11 +28,12 @@ namespace LateralCMS
             {
                 app.MapOpenApi();
             }
-
+            
             app.UseHttpsRedirection();
-
+            
+            app.UseAuthentication();
+            
             app.UseAuthorization();
-
 
             app.MapControllers();
 
