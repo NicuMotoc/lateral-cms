@@ -4,6 +4,7 @@ using LateralCMS.Application.Commands;
 using LateralCMS.Application.Queries;
 using LateralCMS.Auth;
 using LateralCMS.Infrastructure.Persistence.EF;
+using LateralCMS.WebApi.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,8 +16,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddControllers()
-            .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CmsEventDtoValidator>());
+        builder.Services.AddValidatorsFromAssemblyContaining<CmsEventDtoValidator>();
         builder.Services.AddOpenApi();
 
         builder.Services.AddAuthentication("Basic")
@@ -28,6 +28,7 @@ public class Program
         builder.Services.AddScoped<ProcessCmsEventsCommand>();
         builder.Services.AddScoped<DisableEntityCommand>();
         builder.Services.AddScoped<EntityQueryService>();
+        builder.Services.AddScoped<SanitizationService>();
 
         var app = builder.Build();
 
