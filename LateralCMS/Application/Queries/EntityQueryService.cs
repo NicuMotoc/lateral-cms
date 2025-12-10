@@ -1,12 +1,11 @@
-using LateralCMS.Infrastructure.Persistence.EF;
 using LateralCMS.Domain.Entities;
+using LateralCMS.Infrastructure.Persistence.EF;
 
 namespace LateralCMS.Application.Queries;
 
-public class EntityQueryService
+public class EntityQueryService(EfEntityRepository repo)
 {
-    private readonly EfEntityRepository _repo;
-    public EntityQueryService(EfEntityRepository repo) => _repo = repo;
+    private readonly EfEntityRepository _repo = repo;
 
     public async Task<List<CmsEntity>> ListAsync(bool isAdmin)
     {

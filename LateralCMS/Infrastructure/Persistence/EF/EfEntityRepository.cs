@@ -3,10 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LateralCMS.Infrastructure.Persistence.EF;
 
-public class EfEntityRepository
+public class EfEntityRepository(CmsDbContext db)
 {
-    private readonly CmsDbContext _db;
-    public EfEntityRepository(CmsDbContext db) => _db = db;
+    private readonly CmsDbContext _db = db;
 
     public async Task<CmsEntity?> GetByIdAsync(string id) =>
         await _db.Entities.Include(e => e.Versions).FirstOrDefaultAsync(e => e.Id == id);
@@ -15,7 +14,7 @@ public class EfEntityRepository
     {
         var query = _db.Entities.Include(e => e.Versions).AsQueryable();
         if (!includeDisabled)
-            query = query.Where(e => !e.IsDisabledByAdmin && e.IsPublished);
+            query = query.Where(e => !e.IsDisabled && e.IsPublished);
         return await query.ToListAsync();
     }
 
@@ -48,7 +47,7 @@ public class EfEntityRepository
         var entity = await _db.Entities.FirstOrDefaultAsync(e => e.Id == id);
         if (entity != null)
         {
-            entity.IsDisabledByAdmin = true;
+            entity.IsDisabled = true;
             await _db.SaveChangesAsync();
         }
     }

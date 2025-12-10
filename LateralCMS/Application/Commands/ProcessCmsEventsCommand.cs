@@ -1,19 +1,13 @@
 using LateralCMS.Application.DTOs;
 using LateralCMS.Domain.Entities;
 using LateralCMS.Infrastructure.Persistence.EF;
-using Microsoft.Extensions.Logging;
 
 namespace LateralCMS.Application.Commands;
 
-public class ProcessCmsEventsCommand
+public class ProcessCmsEventsCommand(EfEntityRepository repo, ILogger<ProcessCmsEventsCommand> logger)
 {
-    private readonly EfEntityRepository _repo;
-    private readonly ILogger<ProcessCmsEventsCommand> _logger;
-    public ProcessCmsEventsCommand(EfEntityRepository repo, ILogger<ProcessCmsEventsCommand> logger)
-    {
-        _repo = repo;
-        _logger = logger;
-    }
+    private readonly EfEntityRepository _repo = repo;
+    private readonly ILogger<ProcessCmsEventsCommand> _logger = logger;
 
     public async Task ProcessAsync(IEnumerable<CmsEventDto> events)
     {
@@ -54,7 +48,7 @@ public class ProcessCmsEventsCommand
         };
         entity.LatestVersion = version.Version;
         entity.IsPublished = true;
-        entity.IsDisabledByAdmin = false;
+        entity.IsDisabled = false;
         entity.Versions.RemoveAll(v => v.Version == version.Version);
         entity.Versions.Add(version);
         await _repo.AddOrUpdateAsync(entity);
