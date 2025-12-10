@@ -3,10 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LateralCMS.Infrastructure.Persistence.EF;
 
-public class CmsDbContext : DbContext
+public class CmsDbContext(DbContextOptions<CmsDbContext> options) : DbContext(options)
 {
-    public CmsDbContext(DbContextOptions<CmsDbContext> options) : base(options) { }
-
     public DbSet<CmsEntity> Entities => Set<CmsEntity>();
     public DbSet<CmsEntityVersion> EntityVersions => Set<CmsEntityVersion>();
 
