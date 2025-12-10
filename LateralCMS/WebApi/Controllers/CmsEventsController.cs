@@ -15,6 +15,9 @@ public class CmsEventsController(ProcessCmsEventsCommand command) : ControllerBa
     [Authorize(Roles = "CMS")]
     public async Task<IActionResult> Ingest([FromBody] List<CmsEventDto> events)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
         await _command.ProcessAsync(events);
         return Ok();
     }

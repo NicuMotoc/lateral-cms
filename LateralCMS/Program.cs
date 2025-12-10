@@ -1,3 +1,5 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using LateralCMS.Application.Commands;
 using LateralCMS.Application.Queries;
 using LateralCMS.Auth;
@@ -13,7 +15,8 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<CmsEventDtoValidator>());
         builder.Services.AddOpenApi();
 
         builder.Services.AddAuthentication("Basic")
