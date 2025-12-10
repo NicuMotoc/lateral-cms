@@ -12,7 +12,7 @@ public class CmsEventsController(ProcessCmsEventsCommand command) : ControllerBa
     private readonly ProcessCmsEventsCommand _command = command;
 
     [HttpPost]
-    [Authorize(Policy = "CmsOnly")]
+    [Authorize(Roles = "CMS")]
     public async Task<IActionResult> Ingest([FromBody] List<CmsEventDto> events)
     {
         await _command.ProcessAsync(events);
