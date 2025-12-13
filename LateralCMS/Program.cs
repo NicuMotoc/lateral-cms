@@ -1,43 +1,56 @@
-
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using LateralCMS.Application.Commands;
+using LateralCMS.Application.Queries;
 using LateralCMS.Auth;
+using LateralCMS.Infrastructure.Persistence.EF;
+using LateralCMS.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
-namespace LateralCMS
+namespace LateralCMS;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
-            builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
-
-            builder.Services.AddAuthentication("Basic")
-                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("Basic", null);
-
-            builder.Services.AddAuthorization();
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
             {
-                app.MapOpenApi();
-            }
-            
-            app.UseHttpsRedirection();
-            
-            app.UseAuthentication();
-            
-            app.UseAuthorization();
+                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+            });
 
-            app.MapControllers();
+        builder.Services.AddFluentValidationAutoValidation();
+        builder.Services.AddFluentValidationClientsideAdapters();
+        builder.Services.AddValidatorsFromAssemblyContaining<CmsEventDtoValidator>();
 
-            app.Run();
+        builder.Services.AddOpenApi();
+
+        builder.Services.AddAuthentication("Basic")
+            .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("Basic", null);
+
+        builder.Services.AddDbContext<CmsDbContext>(opt =>
+            opt.UseInMemoryDatabase("CmsDb"));
+        builder.Services.AddScoped<EfEntityRepository>();
+        builder.Services.AddScoped<EfReadOnlyEntityRepository>();
+        builder.Services.AddScoped<ProcessCmsEventsCommand>();
+        builder.Services.AddScoped<DisableEntityCommand>();
+        builder.Services.AddScoped<EntityQueryService>();
+        builder.Services.AddScoped<SanitizationService>();
+
+        var app = builder.Build();
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.MapOpenApi();
         }
+        app.UseHttpsRedirection();
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.MapControllers();
+        app.Run();
     }
 }
