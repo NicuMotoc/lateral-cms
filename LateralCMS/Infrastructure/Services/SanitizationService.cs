@@ -1,7 +1,7 @@
 using LateralCMS.Application.DTOs;
 using System.Text.Encodings.Web;
 
-namespace LateralCMS.WebApi.Services;
+namespace LateralCMS.Infrastructure.Services;
 
 public class SanitizationService
 {

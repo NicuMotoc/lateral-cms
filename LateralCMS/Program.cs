@@ -4,9 +4,10 @@ using LateralCMS.Application.Commands;
 using LateralCMS.Application.Queries;
 using LateralCMS.Auth;
 using LateralCMS.Infrastructure.Persistence.EF;
-using LateralCMS.WebApi.Services;
+using LateralCMS.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace LateralCMS;
 
@@ -16,7 +17,12 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        builder.Services.AddControllers();
+
+        builder.Services.AddFluentValidationAutoValidation();
+        builder.Services.AddFluentValidationClientsideAdapters();
         builder.Services.AddValidatorsFromAssemblyContaining<CmsEventDtoValidator>();
+
         builder.Services.AddOpenApi();
 
         builder.Services.AddAuthentication("Basic")

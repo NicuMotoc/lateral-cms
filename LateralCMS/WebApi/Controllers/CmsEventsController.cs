@@ -1,6 +1,6 @@
 using LateralCMS.Application.Commands;
 using LateralCMS.Application.DTOs;
-using LateralCMS.WebApi.Services;
+using LateralCMS.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,14 +15,14 @@ public class CmsEventsController(ProcessCmsEventsCommand command, SanitizationSe
 
     [HttpPost]
     [Authorize(Roles = "CMS")]
-    public async Task<IActionResult> Ingest([FromBody] List<CmsEventDto> events)
+    public async Task<IActionResult> Ingest([FromBody] CmsEventBatchDto batch)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        _sanitizer.Sanitize(events);
+        _sanitizer.Sanitize(batch.Events);
 
-        await _command.ProcessAsync(events);
+        await _command.ProcessAsync(batch.Events);
         return Ok();
     }
 }
