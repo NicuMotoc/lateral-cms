@@ -1,14 +1,14 @@
 # LateralCMS
 
-A Clean Architecture .NET 10 CMS event ingestion and query service.
+A .NET 10 CMS event ingestion and query service.
 
 ## Features
-- Webhook endpoint `/cms/events` for ingesting CMS events (publish, unpublish, delete)
+- Webhook endpoint `/cms/events` for ingesting CMS events (add, update, publish, unpublish, delete)
 - REST API `/entities` for listing and disabling entities
 - Basic Authentication for both CMS and user endpoints
 - In-memory EF Core database
-- Clean Architecture & Screaming Architecture folder structure
-- Logging and validation
+- Clean & Screaming Architecture with CQRS folder structure
+- Logging, validation and sanitization
 
 ## Setup & Run
 
@@ -17,20 +17,15 @@ A Clean Architecture .NET 10 CMS event ingestion and query service.
    ```bash
    dotnet run --project LateralCMS/LateralCMS.csproj
    ```
-3. **API Endpoints**:
-   - `POST /cms/events` (Basic Auth: `cms_webhook_user` / `b7e8e2e2-8c2a-4e2e-9b2e-2e2e2e2e2e2e`)
-   - `GET /entities` (Basic Auth: `admin_user` / `adminpass123` or `normal_user` / `userpass123`)
-   - `POST /entities/{id}/disable` (admin only)
+3. **API Endpoints**: (users are in the appsettings)
+   - `POST /cms/events` (Basic Auth - cms user)
+   - `GET /entities` (Basic Auth - all users)
+   - `POST /entities/{id}/disable` (Basic Auth - admin only)
 
 ## Testing
-- Use tools like Postman or curl to test endpoints with the credentials above.
-- Unit/integration tests are in the `LateralCMS.Tests` project.
+- Use tools like Postman or Insomnia. You can import thee API into your insomnia for example by going to https://localhost:7146/openapi/v1.json
 
 ## Notes
 - All data is confidential and requires authentication.
 - Unpublished entities are not deleted, only hard deletes remove data.
 - Admins see all entities, including disabled ones.
-
----
-
-**.NET 10, Clean Architecture, Screaming Architecture**
