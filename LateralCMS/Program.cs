@@ -17,7 +17,11 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddControllers();
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+            });
 
         builder.Services.AddFluentValidationAutoValidation();
         builder.Services.AddFluentValidationClientsideAdapters();
@@ -31,6 +35,7 @@ public class Program
         builder.Services.AddDbContext<CmsDbContext>(opt =>
             opt.UseInMemoryDatabase("CmsDb"));
         builder.Services.AddScoped<EfEntityRepository>();
+        builder.Services.AddScoped<EfReadOnlyEntityRepository>();
         builder.Services.AddScoped<ProcessCmsEventsCommand>();
         builder.Services.AddScoped<DisableEntityCommand>();
         builder.Services.AddScoped<EntityQueryService>();

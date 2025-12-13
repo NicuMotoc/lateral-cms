@@ -11,7 +11,7 @@ public class CmsDbContext(DbContextOptions<CmsDbContext> options) : DbContext(op
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<CmsEntity>().HasKey(e => e.Id);
-        modelBuilder.Entity<CmsEntity>().OwnsMany(e => e.Versions);
+        modelBuilder.Entity<CmsEntity>().HasMany(e => e.Versions);
         base.OnModelCreating(modelBuilder);
     }
 }

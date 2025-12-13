@@ -10,7 +10,6 @@ public class SanitizationService
         foreach (var evt in events)
         {
             evt.Type = evt.Type?.Trim().ToLowerInvariant();
-            evt.Id = evt.Id?.Trim();
 
             if (evt.Payload != null)
             {

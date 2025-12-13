@@ -6,7 +6,7 @@ public class DisableEntityCommand(EfEntityRepository repo)
 {
     private readonly EfEntityRepository _repo = repo;
 
-    public async Task DisableAsync(string id)
+    public async Task DisableAsync(int id)
     {
         await _repo.DisableAsync(id);
     }

@@ -3,9 +3,9 @@ using LateralCMS.Infrastructure.Persistence.EF;
 
 namespace LateralCMS.Application.Queries;
 
-public class EntityQueryService(EfEntityRepository repo)
+public class EntityQueryService(EfReadOnlyEntityRepository repo)
 {
-    private readonly EfEntityRepository _repo = repo;
+    private readonly EfReadOnlyEntityRepository _repo = repo;
 
     public async Task<List<CmsEntity>> ListAsync(bool isAdmin)
     {

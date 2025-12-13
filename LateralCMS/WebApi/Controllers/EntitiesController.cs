@@ -18,12 +18,18 @@ public class EntitiesController(EntityQueryService query, DisableEntityCommand d
     {
         var isAdmin = User.IsInRole("Admin");
         var entities = await _query.ListAsync(isAdmin);
+
+        if (entities.Count == 0)
+        {
+            return NoContent();
+        }
+
         return Ok(entities);
     }
 
     [HttpPost("{id}/disable")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Disable(string id)
+    public async Task<IActionResult> Disable(int id)
     {
         await _disable.DisableAsync(id);
         return Ok();

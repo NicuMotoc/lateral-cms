@@ -7,8 +7,8 @@ public class CmsEventDtoValidator : AbstractValidator<CmsEventDto>
     {
         RuleFor(x => x.Type)
             .NotEmpty()
-            .Must(t => new[] { "publish", "unpublish", "delete" }.Contains(t.ToLowerInvariant()))
-            .WithMessage("Type must be publish, unpublish, or delete.");
+            .Must(t => new[] { "add", "update", "publish", "unpublish", "delete" }.Contains(t.ToLowerInvariant()))
+            .WithMessage("Type must be add, update, publish, unpublish, or delete.");
 
         RuleFor(x => x.Id)
             .NotEmpty();
