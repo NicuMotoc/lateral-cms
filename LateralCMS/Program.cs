@@ -1,6 +1,7 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using LateralCMS.Application.Commands;
+using LateralCMS.Application.DTOs.Validators;
 using LateralCMS.Application.Queries;
 using LateralCMS.Auth;
 using LateralCMS.Infrastructure.Persistence.EF;
@@ -20,7 +21,7 @@ public class Program
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
             {
-                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
             });
 
         builder.Services.AddFluentValidationAutoValidation();
