@@ -1,7 +1,7 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using LateralCMS.Application.Commands;
-using LateralCMS.Application.DTOs;
+using LateralCMS.Application.DTOs.Validators;
 using LateralCMS.Application.Queries;
 using LateralCMS.Auth;
 using LateralCMS.Infrastructure.Persistence.EF;
