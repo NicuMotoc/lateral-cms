@@ -1,5 +1,6 @@
 using FluentValidation;
-using LateralCMS.Application.DTOs;
+
+namespace LateralCMS.Application.DTOs;
 
 public class CmsEventDtoValidator : AbstractValidator<CmsEventDto>
 {
@@ -11,7 +12,7 @@ public class CmsEventDtoValidator : AbstractValidator<CmsEventDto>
             .WithMessage("Type must be add, update, publish, unpublish, or delete.");
 
         RuleFor(x => x.Id)
-            .NotEmpty();
+          .NotEmpty();
 
         RuleFor(x => x.Timestamp)
             .NotEmpty();

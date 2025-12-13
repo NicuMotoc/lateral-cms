@@ -1,6 +1,7 @@
 using LateralCMS.Application.DTOs;
 using LateralCMS.Domain.Entities;
 using LateralCMS.Infrastructure.Persistence.EF;
+using Microsoft.Extensions.Logging;
 
 namespace LateralCMS.Application.Commands;
 
@@ -30,7 +31,7 @@ public class ProcessCmsEventsCommand(EfEntityRepository repo, ILogger<ProcessCms
                         await HandleUnpublish(evt);
                         break;
                     case "delete":
-                        await _repo.DeleteAsync(evt.Id);
+                        await HandleDelete(evt);
                         break;
                 }
                 _logger.LogInformation("Processed event {Type} for {Id}", evt.Type, evt.Id);
@@ -46,6 +47,7 @@ public class ProcessCmsEventsCommand(EfEntityRepository repo, ILogger<ProcessCms
     {
         var entity = new CmsEntity
         {
+            Id = evt.Id,
             LatestVersion = 1,
             IsPublished = false,
             IsDisabled = false,
@@ -60,19 +62,14 @@ public class ProcessCmsEventsCommand(EfEntityRepository repo, ILogger<ProcessCms
                 }
             ]
         };
-
-        await _repo.AddOrUpdateAsync(entity);
+        await _repo.AddOrUpdateAsync(entity, evt.Payload);
     }
 
     private async Task HandleUpdate(CmsEventDto evt)
     {
         var entity = await _repo.GetByIdAsync(evt.Id);
-
         if (entity == null) return;
-
-        var previousVersion = entity.LatestVersion;
-        entity.LatestVersion++;
-        await _repo.UnpublishAsync(entity.Id, previousVersion);
+       
         await _repo.AddOrUpdateAsync(entity, evt.Payload);
     }
 
@@ -80,15 +77,52 @@ public class ProcessCmsEventsCommand(EfEntityRepository repo, ILogger<ProcessCms
     {
         if (evt.Id == 0 || evt.Version is null)
             return;
-
+        var entity = await _repo.GetByIdAsync(evt.Id);
+        if (entity == null) return;
+        foreach (var v in entity.Versions)
+            v.IsUnpublished = v.Version != evt.Version.Value;
+        entity.IsPublished = true;
+        entity.IsDisabled = false;
+        entity.LatestVersion = evt.Version.Value;
         await _repo.PublishAsync(evt.Id, evt.Version.Value);
+        await _repo.AddOrUpdateAsync(entity);
     }
 
     private async Task HandleUnpublish(CmsEventDto evt)
     {
         if (evt.Id == 0 || evt.Version is null)
             return;
+        var entity = await _repo.GetByIdAsync(evt.Id);
+        if (entity == null) return;
+        var versionToUnpublish = entity.Versions.FirstOrDefault(v => v.Version == evt.Version.Value);
+        if (versionToUnpublish != null)
+            versionToUnpublish.IsUnpublished = true;
+        var previousPublished = entity.Versions
+            .Where(v => !v.IsUnpublished && v.Version != evt.Version.Value)
+            .OrderByDescending(v => v.Version)
+            .FirstOrDefault();
+        if (previousPublished != null)
+        {
+            foreach (var v in entity.Versions)
+                v.IsUnpublished = v.Version != previousPublished.Version;
+            entity.IsPublished = true;
+            entity.IsDisabled = false;
+            entity.LatestVersion = previousPublished.Version;
+            await _repo.PublishAsync(entity.Id, previousPublished.Version);
+        }
+        else
+        {
+            entity.IsPublished = false;
+            entity.IsDisabled = true;
+            await _repo.DisableAsync(entity.Id);
+        }
+        await _repo.AddOrUpdateAsync(entity);
+    }
 
-        await _repo.UnpublishAsync(evt.Id, evt.Version.Value);
+    private async Task HandleDelete(CmsEventDto evt)
+    {
+        if (evt.Id == 0)
+            return;
+        await _repo.DeleteAsync(evt.Id);
     }
 }
